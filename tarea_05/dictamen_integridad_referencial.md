@@ -1,0 +1,7 @@
+# Tarea 5. Dictamen de integridad referencial
+
+Se **rechaza** reemplazar `ON DELETE RESTRICT` por `ON DELETE CASCADE` en las relaciones del núcleo bancario. Un borrado accidental o no autorizado de un cliente podría eliminar en cadena sus cuentas y, a través de ellas, registros de operaciones; también podría afectar los créditos asociados. Esto destruiría evidencia financiera y dificultaría la reconstrucción del historial. Que `CASCADE` facilite limpiar pruebas no justifica trasladarlo a producción: los ambientes de prueba deben aislarse y reiniciarse con procedimientos propios.
+
+Los registros de `core.transactions` y `core.loans` son evidencia para conciliaciones, investigaciones y obligaciones contables y regulatorias. Su conservación debe obedecer las políticas legales aplicables de retención, protección de datos y auditoría; no corresponde borrarlos automáticamente por la salida de un cliente. Se mantienen las claves foráneas con `ON DELETE RESTRICT`, los permisos mínimos necesarios y controles sobre operaciones de borrado.
+
+Cuando un cliente termina su relación con OmniBank, se marca `core.customers.is_active = false` y se desactivan o cierran sus cuentas mediante el estado correspondiente, conservando sus identificadores y referencias históricas. Los movimientos y préstamos permanecen consultables para personal autorizado. **Resolución:** mantener la integridad referencial restrictiva y aplicar baja lógica, no borrado en cascada.
